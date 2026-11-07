@@ -8,7 +8,7 @@
 
 int main() {
 	setlocale(LC_ALL, ".UTF8");
-	int rows, cols, i, j, c;
+	int rows, cols, i, j, c, showM, choice;
 	int mat[10][10]; //исх массив
 	int mat2[10][10];//преобразованный массив
 	int res = 0;// сколько элементов уже положили в result
@@ -24,97 +24,116 @@ int main() {
 	printf("\n");
 	printf("\n");
 
-	printf("*Программа преобразует двумерный массив таким образом, чтобы сначала располагались все элементы встолбце, отличающиеся от максимального элемента более чем на 20 %, а потом — все остальные.\n");
+	printf("*Программа преобразует двумерный массив таким образом, чтобы сначала располагались все элементы встолбце,\nотличающиеся от максимального элемента более чем на 20%, а потом — все остальные.\n");
 	printf("\n");
 
-	printf("Введите колличество строк (макс 10): \n");
-	scanf_s("%d", &rows);
-	printf("Введите колличество столбцов (макс 10): \n");
-	scanf_s("%d", &cols);
+	printf("*Программа находит максиимальный элемент в какждом столбце и относитьльно его ищет эллементы меньше его на 20 %\nи перестраивает стлбец. Максимальные элементы могут быть выведены по желанию пользователя.  \n");
+	do {
+		printf("Введите колличество строк (макс 10): \n");
+		scanf_s("%d", &rows);
+		printf("Введите колличество столбцов (макс 10): \n");
+		scanf_s("%d", &cols);
 
-	printf("\n");
+		printf("\n");
 
 
-	printf("Как вы хотите заполнить массив: \n1 - Вручную\n2 - Случайным образом\n");
-	scanf_s("%d", &c);
+		printf("Как вы хотите заполнить массив: \n1 - Вручную\n2 - Случайным образом\n3 - Взять данные из файла\n");
+		scanf_s("%d", &choice);
 
-	srand(time(NULL));
 
-	if (c == 1) {
-		for (i = 0; i < rows; i++) {
-			for (j = 0; j < cols; j++) {
-				printf("Элемент [%d][%d]: ", i, j);
-				scanf_s("%d", &mat[i][j]);
+
+		switch (choice) {
+
+		case 1:
+			for (i = 0; i < rows; i++) {
+				for (j = 0; j < cols; j++) {
+					printf("Элемент [%d][%d]: ", i, j);
+					scanf_s("%d", &mat[i][j]);
+				}
 			}
+			break;
 
+		case 2:
+			srand(time(NULL));
+			printf("Cгенерированная маcсив:\n");
+			for (i = 0; i < rows; i++) {
+				for (j = 0; j < cols; j++) {
+					mat[i][j] = rand() % 100;
+					printf("%d\t", mat[i][j]);
+				}
+				printf("\n");
+			}
 		}
-	}
-	else {
-		printf("Cгенерированная маcсив:\n");
-		for (i = 0; i < rows; i++) {
+
+
+		//нахождение максимума в столбцах
+		int max[10];
+		for (j = 0; j < cols; j++) {
+			int current_max = -1;
+			for (i = 0; i < rows; i++) {
+				if (mat[i][j] > current_max) {
+					current_max = mat[i][j];
+				}
+			}
+			max[j] = current_max;
+		}
+
+		printf("Вывести максимум столбцов?(1 - Да, 0 - Нет):\n");
+		scanf_s("%d", &showM);
+		if (showM == 1) {
+			printf("Максимум в столбцах: ");
 			for (j = 0; j < cols; j++) {
-				mat[i][j] = rand() % 100;
-				printf("%d\t", mat[i][j]);
+				printf("%d ", max[j]);
 			}
 			printf("\n");
 		}
-	}
-	//нахождение максимума в столбцах
-	int max[10];
-	for (j = 0; j < cols; j++) {
-		int current_max = -1;
-		for (i = 0; i < rows; i++) {
-			if (mat[i][j] > current_max) {
-				current_max = mat[i][j];
+
+		//нахождение элементов  оличаются от макс столбца более чем на 20%
+		// элемнт < макс * 0.8
+		for (j = 0; j < cols; j++) {
+			for (i = 0; i < rows; i++) {
+				if (mat[i][j] * 10 < max[j] * 8) {
+					result[res] = mat[i][j];
+					res++;
+
+				}
 			}
+
 		}
-		max[j] = current_max;
-	}
 
 
-	//нахождение элементов  оличаются от макс столбца более чем на 20%
-	// элемнт < макс * 0.8
-	for (j = 0; j < cols; j++) {
-		for (i = 0; i < rows; i++) {
-			if (mat[i][j] * 10 < max[j] * 8) {
-				result[res] = mat[i][j];
-				res++;
-
+		//нахлждение остальных элементов
+		for (j = 0; j < cols; j++) {
+			for (i = 0; i < rows; i++) {
+				if (mat[i][j] * 10 >= max[j] * 8) {
+					result[res] = mat[i][j];
+					res++;
+				}
 			}
+
+		}
+		int res_c = cols;
+		int res_r = (res + res_c - 1) / res_c;
+
+
+		for (i = 0; i < res; i++) {
+			int a = i / res_c;
+			int b = i % res_c;
+			mat2[a][b] = result[i];
 		}
 
-	}
-
-
-	//нахлждение остальных элементов
-	for (j = 0; j < cols; j++) {
-		for (i = 0; i < rows; i++) {
-			if (mat[i][j] * 10 >= max[j] * 8) {
-				result[res] = mat[i][j];
-				res++;
+		printf("\nПреобразованный массив:\n");
+		for (i = 0; i < res_r; i++) {
+			for (j = 0; j < res_c; j++) {
+				int index = i * res_c + j;
+				printf("%d\t ", mat2[i][j]);
 			}
+			printf("\n");
 		}
 
-	}
-	int res_c = cols;
-	int res_r = (res + res_c - 1) / res_c;
+		printf("Желаете начать заново? (1 - Да, 2 - Нет): ");
+		scanf_s("%d", &c);
 
-
-	for (i = 0; i < res; i++) {
-		int a = i / res_c;
-		int b = i % res_c;
-		mat2[a][b] = result[i];
-	}
-
-	printf("\nПреобразованный массив:\n");
-	for (i = 0; i < res_r; i++) {
-		for (j = 0; j < res_c; j++) {
-			int index = i * res_c + j;
-			printf("%d\t ", mat2[i][j]);
-		}
-		printf("\n");
-	}
-
-
+	} while (c == 1);
 	return 0;
 }
