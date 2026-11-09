@@ -69,7 +69,7 @@ int main() {
 		//нахождение максимума в столбцах
 		int max[10];
 		for (j = 0; j < cols; j++) {
-			int current_max = -1;
+			int current_max = 0;
 			for (i = 0; i < rows; i++) {
 				if (mat[i][j] > current_max) {
 					current_max = mat[i][j];
